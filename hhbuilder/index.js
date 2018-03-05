@@ -56,7 +56,6 @@ function checkSmoke() {
 }
 
 function clearErrors(type) {
-  console.log('What is the error type: ', type);
   if (type === 'num') {
     document.querySelectorAll('.error h2')[0].textContent = '';
   } else if (type === 'rel') {
@@ -73,8 +72,6 @@ function clearErrors(type) {
 }
 
 function clearForm() {
-  console.log('Reset form works: ', form.reset);
-
   clearErrors('all');
   document.querySelector('ul.preview li.age').textContent = 'Age: ';
   document.querySelector('ul.preview li.relationship').textContent = 'Relationship: ';
@@ -162,7 +159,7 @@ function handleRemove(e) {
 function handleSubmit(e) {
   const debug = document.querySelector('pre');
   e.preventDefault();
-  console.dir(debug);
+
   if (checkHousehold()) {
     const houseJSON = JSON.stringify(household);
     debug.textContent = houseJSON;
