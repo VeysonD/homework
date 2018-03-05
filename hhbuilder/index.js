@@ -163,6 +163,7 @@ function handleSubmit(e) {
   if (checkHousehold()) {
     const houseJSON = JSON.stringify(household);
     debug.textContent = houseJSON;
+    debug.style.display = 'inline';
   } else {
     console.error('Make sure to add at least one member before submitting');
   }
