@@ -5,6 +5,16 @@ Your application needs a way to capture information about a household applying
 for health insurance coverage. Develop a UI for building a household up from
 individual people.
 
+Running
+-------
+
+1. Double click index.html
+1. Fill out the form to add a family member
+1. Can delete a family member by clicking on their corresponding delete button
+1. Submit the current household data as JSON to the "server"
+1. Enjoy!
+
+
 Task
 ----
 
