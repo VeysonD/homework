@@ -1,4 +1,3 @@
-// your code goes here ...
 const form = document.querySelector('form');
 const addButton = document.querySelector('.add');
 const house = document.querySelector('ol.household');
@@ -8,45 +7,42 @@ const age = document.querySelector('input[name="age"]');
 const relationship = document.querySelector('select');
 const smoker = document.querySelector('input[name="smoker"]');
 
-const household = [];
+let household = [];
 let index = 0;
-
-// CURRENT TODO:
-
-// - Household li has span button to remove that member
-// - JSON.stringify() the household array and append to ".debug" on submit
-//   - check if household isn't empty first before sending
 
 // Prevent default submit behavior
 addButton.type = 'button';
 
-// // Delete these
-console.dir(form);
-// console.dir(addButton);
-// console.dir(house);
 
 function checkAge() {
-  // check if it is a number first or less than 1
   let currAge = parseInt(age.value);
-  if (!isNumeric(age.value) || currAge < 1) {
+  if (!isNumeric(age.value) || currAge < 1 || age.value ==='') {
     console.error('this value is NO GOOD: ', age.value);
+    handleError('num');
     return false;
-    // show error message
   } else {
-    console.log('Here is the current age: ', currAge);
+    clearErrors('num');
     return true;
   }
+}
 
+function checkHousehold() {
+  if (household.length === 0) {
+    handleError('submit');
+    return false;
+  } else {
+    clearErrors('submit');
+    return true;
+  }
 }
 
 function checkRelationship() {
-  // console.dir(relationship);
-  // console.log('What is the relationship value: ', relationship.value);
   if (relationship.value === '') {
     console.error('this relationship is NO GOOD: ', relationship.value);
+    handleError('rel');
     return false;
   } else {
-    console.log('Current relationship: ', relationship.value);
+    clearErrors('rel');
     return true;
   }
 }
@@ -59,8 +55,27 @@ function checkSmoke() {
   }
 }
 
+function clearErrors(type) {
+  console.log('What is the error type: ', type);
+  if (type === 'num') {
+    document.querySelectorAll('.error h2')[0].textContent = '';
+  } else if (type === 'rel') {
+    document.querySelectorAll('.error h2')[1].textContent = '';
+  } else if (type === 'submit') {
+    document.querySelectorAll('.error h2')[2].textContent = '';
+  } else if (type === 'all') {
+    document.querySelectorAll('.error h2')[0].textContent = '';
+    document.querySelectorAll('.error h2')[1].textContent = '';
+  } else {
+    document.querySelectorAll('.error h2')[2].textContent = '';
+    console.error('wrong error type');
+  }
+}
+
 function clearForm() {
   console.log('Reset form works: ', form.reset);
+
+  clearErrors('all');
   document.querySelector('ul.preview li.age').textContent = 'Age: ';
   document.querySelector('ul.preview li.relationship').textContent = 'Relationship: ';
   document.querySelector('ul.preview li.smoker').textContent = 'Habit: Non-smoker';
@@ -69,13 +84,14 @@ function clearForm() {
 
 function handleAdd(e) {
   const member = {};
-  console.log('add button clicked');
+  const ageCheck = checkAge();
+  const relCheck = checkRelationship();
 
-  if (checkAge() && checkRelationship()) {
+  if (ageCheck && relCheck) {
     const addAge = age.value;
     const addRelationship = relationship.value;
     const addSmoker = checkSmoke();
-    // const preview = document.querySelector('ul.preview').cloneNode(true);
+
     const html = `
       <li data-index=${index}>
         <strong>Family Member</strong>
@@ -84,6 +100,7 @@ function handleAdd(e) {
             <li class="relationship">Relationship: ${relationship.value}</li>
             <li class="smoker">Habit: ${checkSmoke()}</li>
         </ul>
+        <button class="remove" type="button" onClick=handleRemove(event)>Remove</button>
       </li>
     `
 
@@ -96,7 +113,21 @@ function handleAdd(e) {
     house.insertAdjacentHTML('beforeend', html);
 
     index++;
+    checkHousehold();
     clearForm();
+  }
+}
+
+function handleError(type) {
+  const error = document.querySelectorAll('.error h2');
+  if (type === 'num') {
+    error[0].textContent = 'Please select a valid age that is greater than 0';
+  } else if (type === 'rel') {
+    error[1].textContent = 'Please select a reationship';
+  } else if (type === 'submit') {
+    error[2].textContent = 'Please add at least one member before submitting';
+  } else {
+    console.error('handleError error with a type of: ', type);
   }
 }
 
@@ -117,14 +148,36 @@ function handlePreviewChange(e) {
   }
 }
 
-function handleSubmit(e) {
-  e.preventDefault();
-  console.log('Submit has been fired');
+function handleRemove(e) {
+  const removeIndex = parseInt(e.target.parentNode.attributes[0].value);
+  const removeNode = document.querySelector(`li[data-index="${removeIndex}"]`);
 
+  household = household.filter(member => {
+    return member.index !== removeIndex;
+  });
+
+  removeNode.remove();
+}
+
+function handleSubmit(e) {
+  const debug = document.querySelector('pre');
+  e.preventDefault();
+  console.dir(debug);
+  if (checkHousehold()) {
+    const houseJSON = JSON.stringify(household);
+    debug.textContent = houseJSON;
+  } else {
+    console.error('Make sure to add at least one member before submitting');
+  }
 }
 
 function initialize() {
   const html = `
+  <div class="error" style="color:red;">
+    <h2></h2>
+    <h2></h2>
+    <h2></h2>
+  </div>
     <h3>Family Member Preview</h3>
     <ul class="preview" data-index="${index}">
         <li class="age">Age: ${age.value}</li>
